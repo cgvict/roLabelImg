@@ -13,9 +13,17 @@ The original link is here<https://github.com/tzutalin/labelImg>.
 
 It is written in Python and uses Qt for its graphical interface.
 
+`Watch a demo by author cgvict`
+
+.. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/demo4.png
+     :alt: Demo Image
+
+.. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/roLabelImg.gif
+
 Annotations are saved as XML files almost like PASCAL VOC format, the format used by `ImageNet <http://www.image-net.org/>`__.
 
 ```
+
 <annotation verified="yes">
   <folder>hsrc</folder>
   <filename>100000001</filename>
@@ -57,13 +65,8 @@ Annotations are saved as XML files almost like PASCAL VOC format, the format use
     </robndbox>
   </object>
 </annotation>
+
 ```
-
-.. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/demo4.png
-     :alt: Demo Image
-
-.. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/roLabelImg.gif
-`Watch a demo by author cgvict`
 
 
 Installation
