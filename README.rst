@@ -19,7 +19,9 @@ by `ImageNet <http://www.image-net.org/>`__.
 .. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/demo.png
      :alt: Demo Image
 
-`Watch a demo video by author tzutalin <https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/roLabelImg.gif>`__
+.. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/roLabelImg.gif
+`Watch a demo by author cgvict`
+
 
 Installation
 ------------------
