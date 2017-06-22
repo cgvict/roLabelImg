@@ -517,6 +517,9 @@ class Canvas(QWidget):
             brush = QBrush(Qt.BDiagPattern)
             p.setBrush(brush)
             p.drawRect(leftTop.x(), leftTop.y(), rectWidth, rectHeight)
+            
+            p.setPen(self.lineColor)
+            p.drawLine(leftTop.x(),rightBottom.y(),rightBottom.x(),leftTop.y())
 
         self.setAutoFillBackground(True)
         if self.verified:
