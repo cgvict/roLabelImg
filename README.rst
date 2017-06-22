@@ -16,7 +16,7 @@ It is written in Python and uses Qt for its graphical interface.
 Annotations are saved as XML files in PASCAL VOC format, the format used
 by `ImageNet <http://www.image-net.org/>`__.
 
-.. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/demo.jpg
+.. image:: /demo/demo.jpg
      :alt: Demo Image
 
 `Watch a demo video by author tzutalin <https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/roLabelImg.gif>`__
