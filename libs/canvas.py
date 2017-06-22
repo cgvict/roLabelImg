@@ -65,6 +65,8 @@ class Canvas(QWidget):
         self.verified = False
         # judge can draw rotate rect
         self.canDrawRotatedRect = True
+        self.hideRotated = False
+        self.hideNormal = False
 
     def enterEvent(self, ev):
         self.overrideCursor(self._cursor)
@@ -140,7 +142,7 @@ class Canvas(QWidget):
             #     self.repaint()
             if self.selectedVertex() and self.selectedShape.isRotated:
                 self.boundedRotateShape(pos)
-                # self.shapeMoved.emit()
+                self.shapeMoved.emit()
                 self.repaint()
 
             return
@@ -197,15 +199,16 @@ class Canvas(QWidget):
         pos = self.transformPos(ev.pos())
         # print('sldkfj %d %d' % (pos.x(), pos.y()))
         if ev.button() == Qt.LeftButton:
+            self.hideBackroundShapes(True)
             if self.drawing():
                 self.handleDrawing(pos)
-            else:
+            else:                
                 self.selectShapePoint(pos)
                 self.prevPoint = pos
                 self.repaint()
         elif ev.button() == Qt.RightButton and self.editing():
             self.selectShapePoint(pos)
-            
+            self.hideBackroundShapes(True)
             # if self.selectedShape is not None:
             #     print('point is (%d, %d)' % (pos.x(), pos.y()))
             #     self.selectedShape.rotate(10)
@@ -213,7 +216,8 @@ class Canvas(QWidget):
             self.prevPoint = pos
             self.repaint()
 
-    def mouseReleaseEvent(self, ev):        
+    def mouseReleaseEvent(self, ev):  
+        self.hideBackroundShapes(False)      
         if ev.button() == Qt.RightButton and not self.selectedVertex():            
             menu = self.menus[bool(self.selectedShapeCopy)]
             self.restoreCursor()
@@ -244,6 +248,7 @@ class Canvas(QWidget):
         self.selectedShapeCopy = None
 
     def hideBackroundShapes(self, value):
+        print("hideBackroundShapes")
         self.hideBackround = value
         if self.selectedShape:
             # Only hide other shapes if there is a current selection.
@@ -275,7 +280,9 @@ class Canvas(QWidget):
             self.update()
 
     def setHiding(self, enable=True):
+        print('setHiding')
         self._hideBackround = self.hideBackround if enable else False
+        print(self._hideBackround)
 
     def canCloseShape(self):
         return self.drawing() and self.current and len(self.current) > 2
@@ -392,17 +399,18 @@ class Canvas(QWidget):
 
     def boundedRotateShape(self, pos):
         # print("Rotate Shape2")          
-        # judge if some vertex is out of pixmap
+        # judge if some vertex is out of pixma
         index, shape = self.hVertex, self.hShape
         point = shape[index]
 
         angle = self.getAngle(shape.center,pos,point)
-        for i, p in enumerate(shape.points):
-            if self.outOfPixmap(shape.rotatePoint(p,angle)):
-                # print("out of pixmap")
-                return
-        shape.rotate(angle)
-        self.prevPoint = pos
+        # for i, p in enumerate(shape.points):
+        #     if self.outOfPixmap(shape.rotatePoint(p,angle)):
+        #         # print("out of pixmap")
+        #         return
+        if not self.rotateOutOfBound(angle):
+            shape.rotate(angle)
+            self.prevPoint = pos
 
     def getAngle(self, center, p1, p2):
         dx1 = p1.x() - center.x();
@@ -498,8 +506,9 @@ class Canvas(QWidget):
         Shape.scale = self.scale
         for shape in self.shapes:
             if (shape.selected or not self._hideBackround) and self.isVisible(shape):
-                shape.fill = shape.selected or shape == self.hShape
-                shape.paint(p)
+                if (shape.isRotated and not self.hideRotated) or (not shape.isRotated and not self.hideNormal):
+                    shape.fill = shape.selected or shape == self.hShape
+                    shape.paint(p)
         if self.current:
             self.current.paint(p)
             self.line.paint(p)
@@ -518,6 +527,7 @@ class Canvas(QWidget):
             p.setBrush(brush)
             p.drawRect(leftTop.x(), leftTop.y(), rectWidth, rectHeight)
             
+            #draw dialog line of rectangle
             p.setPen(self.lineColor)
             p.drawLine(leftTop.x(),rightBottom.y(),rightBottom.x(),leftTop.y())
 
@@ -553,7 +563,7 @@ class Canvas(QWidget):
     def finalise(self):
         assert self.current
         self.current.isRotated = self.canDrawRotatedRect
-        print(self.canDrawRotatedRect)
+        # print(self.canDrawRotatedRect)
         self.current.close()
         self.shapes.append(self.current)
         self.current = None
@@ -638,7 +648,7 @@ class Canvas(QWidget):
             delta = ev.angleDelta()
             h_delta = delta.x()
             v_delta = delta.y()
-
+        # print('scrolling vdelta is %d, hdelta is %d' % (v_delta, h_delta))
         mods = ev.modifiers()
         if Qt.ControlModifier == int(mods) and v_delta:
             self.zoomRequest.emit(v_delta)
@@ -649,6 +659,7 @@ class Canvas(QWidget):
 
     def keyPressEvent(self, ev):
         key = ev.key()
+        
         if key == Qt.Key_Escape and self.current:
             print('ESC press')
             self.current = None
@@ -664,6 +675,34 @@ class Canvas(QWidget):
             self.moveOnePixel('Up')
         elif key == Qt.Key_Down and self.selectedShape:
             self.moveOnePixel('Down')
+        elif key == Qt.Key_Z and self.selectedShape and not self.rotateOutOfBound(0.1):
+            self.selectedShape.rotate(0.1)
+            self.shapeMoved.emit() 
+            self.update()  
+        elif key == Qt.Key_X and self.selectedShape and not self.rotateOutOfBound(0.01):
+            self.selectedShape.rotate(0.01) 
+            self.shapeMoved.emit()
+            self.update()  
+        elif key == Qt.Key_C and self.selectedShape and not self.rotateOutOfBound(-0.01):
+            self.selectedShape.rotate(-0.01) 
+            self.shapeMoved.emit()
+            self.update()  
+        elif key == Qt.Key_V and self.selectedShape and not self.rotateOutOfBound(-0.1):
+            self.selectedShape.rotate(-0.1)
+            self.shapeMoved.emit()
+            self.update()
+        elif key == Qt.Key_R:
+            self.hideRotated = not self.hideRotated
+            self.update()
+        elif key == Qt.Key_N:
+            self.hideNormal = not self.hideNormal
+            self.update()
+            
+    def rotateOutOfBound(self, angle):
+        for i, p in enumerate(self.selectedShape.points):
+            if self.outOfPixmap(self.selectedShape.rotatePoint(p,angle)):
+                return True
+        return False
 
     def moveOnePixel(self, direction):
         # print(self.selectedShape.points)
@@ -673,24 +712,28 @@ class Canvas(QWidget):
             self.selectedShape.points[1] += QPointF(-1.0, 0)
             self.selectedShape.points[2] += QPointF(-1.0, 0)
             self.selectedShape.points[3] += QPointF(-1.0, 0)
+            self.selectedShape.center += QPointF(-1.0, 0)
         elif direction == 'Right' and not self.moveOutOfBound(QPointF(1.0, 0)):
             # print("move Right one pixel")
             self.selectedShape.points[0] += QPointF(1.0, 0)
             self.selectedShape.points[1] += QPointF(1.0, 0)
             self.selectedShape.points[2] += QPointF(1.0, 0)
             self.selectedShape.points[3] += QPointF(1.0, 0)
+            self.selectedShape.center += QPointF(1.0, 0)
         elif direction == 'Up' and not self.moveOutOfBound(QPointF(0, -1.0)):
             # print("move Up one pixel")
             self.selectedShape.points[0] += QPointF(0, -1.0)
             self.selectedShape.points[1] += QPointF(0, -1.0)
             self.selectedShape.points[2] += QPointF(0, -1.0)
             self.selectedShape.points[3] += QPointF(0, -1.0)
+            self.selectedShape.center += QPointF(0, -1.0)
         elif direction == 'Down' and not self.moveOutOfBound(QPointF(0, 1.0)):
             # print("move Down one pixel")
             self.selectedShape.points[0] += QPointF(0, 1.0)
             self.selectedShape.points[1] += QPointF(0, 1.0)
             self.selectedShape.points[2] += QPointF(0, 1.0)
             self.selectedShape.points[3] += QPointF(0, 1.0)
+            self.selectedShape.center += QPointF(0, 1.0)
         self.shapeMoved.emit()
         self.repaint()
 

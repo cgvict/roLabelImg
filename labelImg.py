@@ -189,9 +189,9 @@ class MainWindow(QMainWindow, WindowMixin):
         self.canvas.drawingPolygon.connect(self.toggleDrawingSensitive)
 
         self.setCentralWidget(scroll)
-        self.addDockWidget(Qt.RightDockWidgetArea, self.dock)
+        self.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
         # Tzutalin 20160906 : Add file list and dock to move faster
-        self.addDockWidget(Qt.RightDockWidgetArea, self.filedock)
+        self.addDockWidget(Qt.BottomDockWidgetArea, self.filedock)
         self.dockFeatures = QDockWidget.DockWidgetClosable\
             | QDockWidget.DockWidgetFloatable
         self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
@@ -510,6 +510,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
     def setDirty(self):
         self.dirty = True
+        self.canvas.verified = False
         self.actions.save.setEnabled(True)
 
     def setClean(self):
@@ -643,7 +644,7 @@ class MainWindow(QMainWindow, WindowMixin):
     # Add chris
     def btnstate(self, item= None):
         """ Function to handle difficult examples
-        Update on each object """
+         date on each object """
         if not self.canvas.editing():
             return
 
@@ -1076,7 +1077,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 if self.labelFile is not None:
                     self.labelFile.toggleVerify()
             if self.labelFile is not None:
-                self.canvas.verified = self.labelFile.verified
+                self.canvas.verified = True
             self.paintCanvas()
             self.saveFile()
 

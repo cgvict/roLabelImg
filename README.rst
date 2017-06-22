@@ -9,7 +9,7 @@ roLabelImg
 
 roLabelImg is a graphical image annotation tool can label ROTATED rectangle regions, which is rewrite from 'LabelImg'.
 
-The original link is here<https://github.com/tzutalin/labelImg>.
+The original version 'labelImg''s link is here<https://github.com/tzutalin/labelImg>.
 
 It is written in Python and uses Qt for its graphical interface.
 
@@ -75,8 +75,8 @@ XML Format
 Installation
 ------------------
 
-Download prebuilt binaries
-~~~~~~~~~~~~~~~~~~~~~~~~~~
+Download prebuilt binaries of original 'labelImg'
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 -  `Windows & Linux <http://tzutalin.github.io/labelImg/>`__
 
@@ -127,16 +127,6 @@ Open cmd and go to `labelImg <#labelimg>`__ directory
     pyrcc4 -o resources.py resources.qrc
     python labelImg.py
     python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
-
-Get from PyPI
-~~~~~~~~~~~~~~~~~
-.. code::
-
-    pip install labelImg
-    labelImg
-    labelImg [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
-
-I tested pip on Ubuntu14.04 and 16.04. However, I didn't test pip on MacOS and windows
 
 Use Docker
 ~~~~~~~~~~~~~~~~~
@@ -199,9 +189,15 @@ Hotkeys
 +------------+--------------------------------------------+
 | w          | Create a rect box                          |
 +------------+--------------------------------------------+
+| e          | Create a Rotated rect box                  |
++------------+--------------------------------------------+
 | d          | Next image                                 |
 +------------+--------------------------------------------+
 | a          | Previous image                             |
++------------+--------------------------------------------+
+| r          | Hidden/Show Rotated Rect boxes             |
++------------+--------------------------------------------+
+| n          | Hidden/Show Normal Rect boxes              |
 +------------+--------------------------------------------+
 | del        | Delete the selected rect box               |
 +------------+--------------------------------------------+
@@ -211,6 +207,8 @@ Hotkeys
 +------------+--------------------------------------------+
 | ↑→↓←       | Keyboard arrows to move selected rect box  |
 +------------+--------------------------------------------+
+| zxcv       | Keyboard to rotate selected rect box       |
++------------+--------------------------------------------+
 
 How to contribute
 ~~~~~~~~~~~~~~~~~
@@ -219,7 +217,7 @@ Send a pull request
 
 License
 ~~~~~~~
-`Free software: MIT license <https://github.com/tzutalin/labelImg/blob/master/LICENSE>`_
+`Free software: MIT license <https://github.com/cgvict/roLabelImg/blob/master/LICENSE>`_
 
 
 Related
