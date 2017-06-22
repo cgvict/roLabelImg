@@ -24,6 +24,8 @@ Annotations are saved as XML files almost like PASCAL VOC format, the format use
 
 ```
 
+.. code::
+
 <annotation verified="yes">
   <folder>hsrc</folder>
   <filename>100000001</filename>
@@ -66,7 +68,6 @@ Annotations are saved as XML files almost like PASCAL VOC format, the format use
   </object>
 </annotation>
 
-```
 
 
 Installation
