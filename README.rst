@@ -26,47 +26,47 @@ Annotations are saved as XML files almost like PASCAL VOC format, the format use
 
 .. code::
 
-<annotation verified="yes">
-  <folder>hsrc</folder>
-  <filename>100000001</filename>
-  <path>/Users/haoyou/Library/Mobile Documents/com~apple~CloudDocs/OneDrive/hsrc/100000001.bmp</path>
-  <source>
-    <database>Unknown</database>
-  </source>
-  <size>
-    <width>1166</width>
-    <height>753</height>
-    <depth>3</depth>
-  </size>
-  <segmented>0</segmented>
-  <object>
-    <type>bndbox</type>
-    <name>ship</name>
-    <pose>Unspecified</pose>
-    <truncated>0</truncated>
-    <difficult>0</difficult>
-    <bndbox>
-      <xmin>178</xmin>
-      <ymin>246</ymin>
-      <xmax>974</xmax>
-      <ymax>504</ymax>
-    </bndbox>
-  </object>
-  <object>
-    <type>robndbox</type>
-    <name>ship</name>
-    <pose>Unspecified</pose>
-    <truncated>0</truncated>
-    <difficult>0</difficult>
-    <robndbox>
-      <cx>580.7887</cx>
-      <cy>343.2913</cy>
-      <w>775.0449</w>
-      <h>170.2159</h>
-      <angle>2.889813</angle>
-    </robndbox>
-  </object>
-</annotation>
+    <annotation verified="yes">
+      <folder>hsrc</folder>
+      <filename>100000001</filename>
+      <path>/Users/haoyou/Library/Mobile Documents/com~apple~CloudDocs/OneDrive/hsrc/100000001.bmp</path>
+      <source>
+        <database>Unknown</database>
+      </source>
+      <size>
+        <width>1166</width>
+        <height>753</height>
+        <depth>3</depth>
+      </size>
+      <segmented>0</segmented>
+      <object>
+        <type>bndbox</type>
+        <name>ship</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <bndbox>
+          <xmin>178</xmin>
+          <ymin>246</ymin>
+          <xmax>974</xmax>
+          <ymax>504</ymax>
+        </bndbox>
+      </object>
+      <object>
+        <type>robndbox</type>
+        <name>ship</name>
+        <pose>Unspecified</pose>
+        <truncated>0</truncated>
+        <difficult>0</difficult>
+        <robndbox>
+          <cx>580.7887</cx>
+          <cy>343.2913</cy>
+          <w>775.0449</w>
+          <h>170.2159</h>
+          <angle>2.889813</angle>
+        </robndbox>
+      </object>
+    </annotation>
 
 
 
