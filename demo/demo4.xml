@@ -1,0 +1,28 @@
+<annotation verified="yes">
+  <folder>hsrc</folder>
+  <filename>100000002</filename>
+  <path>/Users/haoyou/Library/Mobile Documents/com~apple~CloudDocs/OneDrive/hsrc/100000002.bmp</path>
+  <source>
+    <database>Unknown</database>
+  </source>
+  <size>
+    <width>1146</width>
+    <height>818</height>
+    <depth>3</depth>
+  </size>
+  <segmented>0</segmented>
+  <object>
+    <type>robndbox</type>
+    <name>ship</name>
+    <pose>Unspecified</pose>
+    <truncated>0</truncated>
+    <difficult>0</difficult>
+    <robndbox>
+      <cx>528.0957</cx>
+      <cy>392.4731</cy>
+      <w>207.4283</w>
+      <h>783.2257</h>
+      <angle>2.632232</angle>
+    </robndbox>
+  </object>
+</annotation>
