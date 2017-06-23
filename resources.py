@@ -5,8 +5,10 @@
 # Created by: The Resource Compiler for PyQt5 (Qt v5.6.2)
 #
 # WARNING! All changes made in this file will be lost!
-
-from PyQt5 import QtCore
+try:
+	from PyQt5 import QtCore
+except ImportError:
+	from PyQt4 import QtCore
 
 qt_resource_data = b"\
 \x00\x00\x01\x4f\
