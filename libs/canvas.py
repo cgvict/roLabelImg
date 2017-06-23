@@ -30,6 +30,9 @@ class Canvas(QWidget):
     shapeMoved = pyqtSignal()
     drawingPolygon = pyqtSignal(bool)
 
+    hideRRect = pyqtSignal(bool)
+    hideNRect = pyqtSignal(bool)
+
     CREATE, EDIT = list(range(2))
 
     epsilon = 11.0
@@ -248,7 +251,7 @@ class Canvas(QWidget):
         self.selectedShapeCopy = None
 
     def hideBackroundShapes(self, value):
-        print("hideBackroundShapes")
+        # print("hideBackroundShapes")
         self.hideBackround = value
         if self.selectedShape:
             # Only hide other shapes if there is a current selection.
@@ -280,9 +283,7 @@ class Canvas(QWidget):
             self.update()
 
     def setHiding(self, enable=True):
-        print('setHiding')
         self._hideBackround = self.hideBackround if enable else False
-        print(self._hideBackround)
 
     def canCloseShape(self):
         return self.drawing() and self.current and len(self.current) > 2
@@ -693,9 +694,11 @@ class Canvas(QWidget):
             self.update()
         elif key == Qt.Key_R:
             self.hideRotated = not self.hideRotated
+            self.hideRRect.emit(self.hideRotated)
             self.update()
         elif key == Qt.Key_N:
             self.hideNormal = not self.hideNormal
+            self.hideNRect.emit(self.hideNormal)
             self.update()
             
     def rotateOutOfBound(self, angle):

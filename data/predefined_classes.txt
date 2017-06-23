@@ -1,3 +1,5 @@
+ship
+plane
 dog
 person
 cat
