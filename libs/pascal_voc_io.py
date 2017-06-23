@@ -3,12 +3,16 @@
 import sys
 from xml.etree import ElementTree
 from xml.etree.ElementTree import Element, SubElement
-from lxml import etree
+
+try: 
+    from lxml import etree
+except ImportError:
+    from xml import etree
+
 import codecs
 import math
 
 XML_EXT = '.xml'
-
 
 class PascalVocWriter:
 
