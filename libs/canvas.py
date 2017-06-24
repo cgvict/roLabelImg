@@ -70,6 +70,7 @@ class Canvas(QWidget):
         self.canDrawRotatedRect = True
         self.hideRotated = False
         self.hideNormal = False
+        self.canOutOfBounding = False
 
     def enterEvent(self, ev):
         self.overrideCursor(self._cursor)
@@ -153,6 +154,11 @@ class Canvas(QWidget):
         # Polygon/Vertex moving.
         if Qt.LeftButton & ev.buttons():
             if self.selectedVertex():
+                # if self.outOfPixmap(pos):
+                #     print("chule ")
+                #     return
+                # else:
+                print("meiyou chujie")
                 self.boundedMoveVertex(pos)
                 self.shapeMoved.emit()
                 self.repaint()
@@ -338,16 +344,22 @@ class Canvas(QWidget):
         # print("Moving Vertex")
         index, shape = self.hVertex, self.hShape
         point = shape[index]
-        if self.outOfPixmap(pos):
+
+        
+        if not self.canOutOfBounding and self.outOfPixmap(pos):
             pos = self.intersectionPoint(point, pos)
+
         
         # print("index is %d" % index)
         sindex = (index + 2) % 4
         # get the other 3 points after transformed
         p2,p3,p4 = self.getAdjointPoints(shape.direction, shape[sindex], pos, index)
-
+        
+        pcenter = (pos+p3)/2        
+        if self.canOutOfBounding and self.outOfPixmap(pcenter):
+            return
         # if one pixal out of map , do nothing
-        if (self.outOfPixmap(p2) or
+        if not self.canOutOfBounding and (self.outOfPixmap(p2) or
             self.outOfPixmap(p3) or
             self.outOfPixmap(p4)):
                 return
@@ -432,6 +444,45 @@ class Canvas(QWidget):
             return -angle
 
     def boundedMoveShape(self, shape, pos):
+        if shape.isRotated and self.canOutOfBounding:
+            c = shape.center
+            dp = pos - self.prevPoint
+            dc = c + dp
+            if dc.x() < 0:
+                dp -= QPointF(min(0,dc.x()), 0)
+            if dc.y() < 0:                
+                dp -= QPointF(0, min(0,dc.y()))                
+            if dc.x() >= self.pixmap.width():
+                dp += QPointF(min(0, self.pixmap.width() - 1  - dc.x()), 0)
+            if dc.y() >= self.pixmap.height():
+                dp += QPointF(0, min(0, self.pixmap.height() - 1 - dc.y()))
+
+        else:            
+            if self.outOfPixmap(pos):
+                return False  # No need to move
+            o1 = pos + self.offsets[0]
+            if self.outOfPixmap(o1):
+                pos -= QPointF(min(0, o1.x()), min(0, o1.y()))
+            o2 = pos + self.offsets[1]
+            if self.outOfPixmap(o2):
+                pos += QPointF(min(0, self.pixmap.width() - 1 - o2.x()),
+                               min(0, self.pixmap.height() - 1 - o2.y()))
+            dp = pos - self.prevPoint
+        # The next line tracks the new position of the cursor
+        # relative to the shape, but also results in making it
+        # a bit "shaky" when nearing the border and allows it to
+        # go outside of the shape's area for some reason. XXX
+        #self.calculateOffsets(self.selectedShape, pos)
+        
+        if dp:
+            shape.moveBy(dp)
+            self.prevPoint = pos
+            shape.close()
+            return True
+        return False
+
+
+    def boundedMoveShape2(self, shape, pos):
         if self.outOfPixmap(pos):
             return False  # No need to move
         o1 = pos + self.offsets[0]
@@ -559,7 +610,7 @@ class Canvas(QWidget):
 
     def outOfPixmap(self, p):
         w, h = self.pixmap.width(), self.pixmap.height()
-        return not (0 <= p.x() <= w and 0 <= p.y() <= h)
+        return not (0 <= p.x() < w and 0 <= p.y() < h)
 
     def finalise(self):
         assert self.current
@@ -704,8 +755,13 @@ class Canvas(QWidget):
             self.hideNormal = not self.hideNormal
             self.hideNRect.emit(self.hideNormal)
             self.update()
-            
+        elif key == Qt.Key_O:
+            self.canOutOfBounding = not self.canOutOfBounding
+
+                
     def rotateOutOfBound(self, angle):
+        if self.canOutOfBounding:
+            return False
         for i, p in enumerate(self.selectedShape.points):
             if self.outOfPixmap(self.selectedShape.rotatePoint(p,angle)):
                 return True
