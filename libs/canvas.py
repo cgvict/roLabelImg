@@ -32,6 +32,7 @@ class Canvas(QWidget):
 
     hideRRect = pyqtSignal(bool)
     hideNRect = pyqtSignal(bool)
+    status = pyqtSignal(str)
 
     CREATE, EDIT = list(range(2))
 
@@ -112,6 +113,7 @@ class Canvas(QWidget):
 
         # Polygon drawing.
         if self.drawing():
+
             self.overrideCursor(CURSOR_DRAW)
             if self.current:
                 color = self.lineColor
@@ -121,7 +123,7 @@ class Canvas(QWidget):
                     pos = self.intersectionPoint(self.current[-1], pos)
                 elif len(self.current) > 1 and self.closeEnough(pos, self.current[0]):
                     # Attract line to starting point and colorise to alert the
-                    # user:
+                    # user:                    
                     pos = self.current[0]
                     color = self.current.line_color
                     self.overrideCursor(CURSOR_POINT)
@@ -130,6 +132,7 @@ class Canvas(QWidget):
                 self.line.line_color = color
                 self.repaint()
                 self.current.highlightClear()
+                self.status.emit("width is %d, height is %d." % (pos.x()-self.line[0].x(), pos.y()-self.line[0].y()))
             return
 
         # Polygon copy moving.
@@ -148,7 +151,7 @@ class Canvas(QWidget):
                 self.boundedRotateShape(pos)
                 self.shapeMoved.emit()
                 self.repaint()
-
+            self.status.emit("(%d,%d)." % (pos.x(), pos.y()))
             return
 
         # Polygon/Vertex moving.
@@ -158,7 +161,7 @@ class Canvas(QWidget):
                 #     print("chule ")
                 #     return
                 # else:
-                print("meiyou chujie")
+                # print("meiyou chujie")
                 self.boundedMoveVertex(pos)
                 self.shapeMoved.emit()
                 self.repaint()
@@ -167,6 +170,7 @@ class Canvas(QWidget):
                 self.boundedMoveShape(self.selectedShape, pos)
                 self.shapeMoved.emit()
                 self.repaint()
+                self.status.emit("(%d,%d)." % (pos.x(), pos.y()))
             return
 
         # Just hovering over the canvas, 2 posibilities:
@@ -184,17 +188,17 @@ class Canvas(QWidget):
                 self.hVertex, self.hShape = index, shape
                 shape.highlightVertex(index, shape.MOVE_VERTEX)
                 self.overrideCursor(CURSOR_POINT)
-                self.setToolTip("Click & drag to move point")
-                self.setStatusTip(self.toolTip())
+                # self.setToolTip("Click & drag to move point.")
+                # self.setStatusTip(self.toolTip())
                 self.update()
                 break
             elif shape.containsPoint(pos):
                 if self.selectedVertex():
                     self.hShape.highlightClear()
                 self.hVertex, self.hShape = None, shape
-                self.setToolTip(
-                    "Click & drag to move shape '%s'" % shape.label)
-                self.setStatusTip(self.toolTip())
+                # self.setToolTip(
+                #     "Click & drag to move shape '%s'" % shape.label)
+                # self.setStatusTip(self.toolTip())
                 self.overrideCursor(CURSOR_GRAB)
                 self.update()
                 break
@@ -203,6 +207,9 @@ class Canvas(QWidget):
                 self.hShape.highlightClear()
                 self.update()
             self.hVertex, self.hShape = None, None
+        
+        self.status.emit("(%d,%d)." % (pos.x(), pos.y()))
+        
 
     def mousePressEvent(self, ev):
         pos = self.transformPos(ev.pos())
@@ -345,11 +352,9 @@ class Canvas(QWidget):
         index, shape = self.hVertex, self.hShape
         point = shape[index]
 
-        
         if not self.canOutOfBounding and self.outOfPixmap(pos):
             pos = self.intersectionPoint(point, pos)
 
-        
         # print("index is %d" % index)
         sindex = (index + 2) % 4
         # get the other 3 points after transformed
@@ -374,8 +379,12 @@ class Canvas(QWidget):
         shape[rindex] = p4
         shape.close()
 
-    
+        # calculate the height and weight, and show it
+        w = math.sqrt((p4.x()-p3.x()) ** 2 + (p4.y()-p3.y()) ** 2)
+        h = math.sqrt((p3.x()-p2.x()) ** 2 + (p3.y()-p2.y()) ** 2)
+        self.status.emit("width is %d, height is %d." % (w,h))
 
+    
     def getAdjointPoints(self, theta, p3, p1, index):
         # p3 = center
         # p3 = 2*center-p1

@@ -190,6 +190,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.canvas.shapeMoved.connect(self.setDirty)
         self.canvas.selectionChanged.connect(self.shapeSelectionChanged)
         self.canvas.drawingPolygon.connect(self.toggleDrawingSensitive)
+        self.canvas.status.connect(self.status)
 
         self.canvas.hideNRect.connect(self.enableCreate)
         self.canvas.hideRRect.connect(self.enableCreateRo)
@@ -546,7 +547,9 @@ class MainWindow(QMainWindow, WindowMixin):
         QTimer.singleShot(0, function)
 
     def status(self, message, delay=5000):
+        # print(message)
         self.statusBar().showMessage(message, delay)
+        self.statusBar().show()
 
     def resetState(self):
         self.itemsToShapes.clear()
@@ -606,6 +609,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.canvas.restoreCursor()
             self.actions.create.setEnabled(True)
             self.actions.createRo.setEnabled(True)
+            
 
     def toggleDrawMode(self, edit=True):
         self.canvas.setEditing(edit)
