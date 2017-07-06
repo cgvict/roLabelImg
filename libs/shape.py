@@ -154,6 +154,15 @@ class Shape(object):
                 else:
                     painter.fillPath(center_path, QColor(0, 0, 0))
 
+    def paintNormalCenter(self, painter):
+        if self.center is not None:
+            center_path = QPainterPath();
+            d = self.point_size / self.scale
+            center_path.addRect(self.center.x() - d / 2, self.center.y() - d / 2, d, d)
+            painter.drawPath(center_path)
+            if not self.isRotated:
+                painter.fillPath(center_path, QColor(0, 0, 0))
+
     def drawVertex(self, path, i):
         d = self.point_size / self.scale
         shape = self.point_type

@@ -72,6 +72,7 @@ class Canvas(QWidget):
         self.hideRotated = False
         self.hideNormal = False
         self.canOutOfBounding = False
+        self.showCenter = False
 
     def enterEvent(self, ev):
         self.overrideCursor(self._cursor)
@@ -570,6 +571,10 @@ class Canvas(QWidget):
                 if (shape.isRotated and not self.hideRotated) or (not shape.isRotated and not self.hideNormal):
                     shape.fill = shape.selected or shape == self.hShape
                     shape.paint(p)
+                elif self.showCenter:
+                    shape.fill = shape.selected or shape == self.hShape
+                    shape.paintNormalCenter(p)
+
         if self.current:
             self.current.paint(p)
             self.line.paint(p)
@@ -766,8 +771,11 @@ class Canvas(QWidget):
             self.update()
         elif key == Qt.Key_O:
             self.canOutOfBounding = not self.canOutOfBounding
+        elif key == Qt.Key_B:
+            self.showCenter = not self.showCenter
+            self.update()
 
-                
+
     def rotateOutOfBound(self, angle):
         if self.canOutOfBounding:
             return False
