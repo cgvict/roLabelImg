@@ -354,7 +354,8 @@ class Canvas(QWidget):
         point = shape[index]
 
         if not self.canOutOfBounding and self.outOfPixmap(pos):
-            pos = self.intersectionPoint(point, pos)
+            return
+            # pos = self.intersectionPoint(point, pos)
 
         # print("index is %d" % index)
         sindex = (index + 2) % 4
@@ -689,6 +690,7 @@ class Canvas(QWidget):
                 y = y1 + ua * (y2 - y1)
                 m = QPointF((x3 + x4) / 2, (y3 + y4) / 2)
                 d = distance(m - QPointF(x2, y2))
+                print("return=",d,i,(x,y))
                 yield d, i, (x, y)
 
     # These two, along with a call to adjustSize are required for the
