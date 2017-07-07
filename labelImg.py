@@ -172,7 +172,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.filedock.setWidget(fileListContainer)
 
         self.zoomWidget = ZoomWidget()
-        self.colorDialog = ColorDialog(parent=self)
+        # self.colorDialog = ColorDialog(parent=self)
 
         self.canvas = Canvas()
         self.canvas.zoomRequest.connect(self.zoomRequest)
