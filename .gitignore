@@ -3,6 +3,7 @@
 .vscode
 __pycache__
 *.DS_Store
+labelImg.py 
 roLabelImg.py.bak
 CONTRIBUTING.rst
 LICENSE
