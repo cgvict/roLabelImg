@@ -1,0 +1,8 @@
+*.pyc
+*/__pycache__
+.vscode
+__pycache__
+*.DS_Store
+roLabelImg.py.bak
+CONTRIBUTING.rst
+LICENSE

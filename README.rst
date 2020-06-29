@@ -1,5 +1,5 @@
 roLabelImg
-========
+==========
 
 .. image:: https://img.shields.io/pypi/v/labelimg.svg
         :target: https://pypi.python.org/pypi/labelimg
@@ -7,7 +7,7 @@ roLabelImg
 .. image:: https://img.shields.io/travis/tzutalin/labelImg.svg
         :target: https://travis-ci.org/tzutalin/labelImg
 
-roLabelImg is a graphical image annotation tool can label ROTATED rectangle regions, which is rewrite from 'LabelImg'.
+roLabelImg is a graphical image annotation tool can label ROTATED rectangle regions, which is rewrite from 'labelImg'.
 
 The original version 'labelImg''s link is here<https://github.com/tzutalin/labelImg>.
 
@@ -18,7 +18,9 @@ It is written in Python and uses Qt for its graphical interface.
 .. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/demo4.png
      :alt: Demo Image
 
-.. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/roLabelImg.gif
+.. image:: https://raw.githubusercontent.com/cgvict/roLabelImg/master/demo/demo_v2.5.gif
+
+https://youtu.be/7D5lvol_QRA
 
 Annotations are saved as XML files almost like PASCAL VOC format, the format used by `ImageNet <http://www.image-net.org/>`__.
 
@@ -98,8 +100,8 @@ Ubuntu Linux
     sudo apt-get install pyqt4-dev-tools
     sudo pip install lxml
     make all
-    ./labelImg.py
-    ./labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
+    ./roLabelImg.py
+    ./roLabelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
 OS X
 ^^^^
@@ -109,8 +111,8 @@ OS X
     brew install qt qt4
     brew install libxml2
     make all
-    ./labelImg.py
-    ./labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
+    ./roLabelImg.py
+    ./roLabelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
 Windows
 ^^^^^^^
@@ -120,13 +122,13 @@ later <https://www.python.org/downloads/windows/>`__,
 `PyQt4 <https://www.riverbankcomputing.com/software/pyqt/download>`__
 and `install lxml <http://lxml.de/installation.html>`__.
 
-Open cmd and go to `labelImg <#labelimg>`__ directory
+Open cmd and go to `roLabelImg <#roLabelimg>`__ directory
 
 .. code::
 
     pyrcc4 -o resources.py resources.qrc
-    python labelImg.py
-    python labelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
+    python roLabelImg.py
+    python roLabelImg.py [IMAGE_PATH] [PRE-DEFINED CLASS FILE]
 
 Use Docker
 ~~~~~~~~~~~~~~~~~

@@ -41,7 +41,7 @@ from pascal_voc_io import PascalVocReader
 from pascal_voc_io import XML_EXT
 from ustr import ustr
 
-__appname__ = 'labelImg'
+__appname__ = 'roLabelImg'
 
 # Utility functions and classes.
 
@@ -102,12 +102,16 @@ class MainWindow(QMainWindow, WindowMixin):
         # Whether we need to save or not.
         self.dirty = False
 
+        self.isEnableCreate = True
+        self.isEnableCreateRo = True
+
         # Enble auto saving if pressing next
         self.autoSaving = True
         self._noSelectionSlot = False
         self._beginner = True
         self.screencastViewer = "firefox"
-        self.screencast = "https://youtu.be/p0nR2YsCY_U"
+        self.screencast = "https://youtu.be/7D5lvol_QRA"
+        # For a demo of original labelImg, please see "https://youtu.be/p0nR2YsCY_U"
 
         # Main widgets and related state.
         self.labelDialog = LabelDialog(parent=self, listItem=self.labelHist)
@@ -153,7 +157,7 @@ class MainWindow(QMainWindow, WindowMixin):
         listLayout.addWidget(self.labelList)
 
         self.dock = QDockWidget(u'Box Labels', self)
-        self.dock.setObjectName(u'Labels')
+        self.dock.setObjectName(u'Label')
         self.dock.setWidget(labelListContainer)
 
         # Tzutalin 20160906 : Add file list and dock to move faster
@@ -165,11 +169,11 @@ class MainWindow(QMainWindow, WindowMixin):
         fileListContainer = QWidget()
         fileListContainer.setLayout(filelistLayout)
         self.filedock = QDockWidget(u'File List', self)
-        self.filedock.setObjectName(u'Files')
+        self.filedock.setObjectName(u'File')
         self.filedock.setWidget(fileListContainer)
 
         self.zoomWidget = ZoomWidget()
-        self.colorDialog = ColorDialog(parent=self)
+        # self.colorDialog = ColorDialog(parent=self)
 
         self.canvas = Canvas()
         self.canvas.zoomRequest.connect(self.zoomRequest)
@@ -187,14 +191,19 @@ class MainWindow(QMainWindow, WindowMixin):
         self.canvas.shapeMoved.connect(self.setDirty)
         self.canvas.selectionChanged.connect(self.shapeSelectionChanged)
         self.canvas.drawingPolygon.connect(self.toggleDrawingSensitive)
+        self.canvas.status.connect(self.status)
+
+        self.canvas.hideNRect.connect(self.enableCreate)
+        self.canvas.hideRRect.connect(self.enableCreateRo)
 
         self.setCentralWidget(scroll)
-        self.addDockWidget(Qt.LeftDockWidgetArea, self.dock)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.dock)
         # Tzutalin 20160906 : Add file list and dock to move faster
-        self.addDockWidget(Qt.BottomDockWidgetArea, self.filedock)
+        self.addDockWidget(Qt.RightDockWidgetArea, self.filedock)
         self.dockFeatures = QDockWidget.DockWidgetClosable\
             | QDockWidget.DockWidgetFloatable
         self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
+        self.filedock.setFeatures(self.filedock.features() ^ self.dockFeatures)
 
         # Actions
         action = partial(newAction, self)
@@ -482,9 +491,10 @@ class MainWindow(QMainWindow, WindowMixin):
         if value:
             self.actions.createMode.setEnabled(True)
             self.actions.editMode.setEnabled(False)
-            self.dock.setFeatures(self.dock.features() | self.dockFeatures)
+            # self.dock.setFeatures(self.dock.features() | self.dockFeatures)
         else:
-            self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
+            pass
+            # self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
 
     def populateModeActions(self):
         if self.beginner():
@@ -519,6 +529,14 @@ class MainWindow(QMainWindow, WindowMixin):
         self.actions.create.setEnabled(True)
         self.actions.createRo.setEnabled(True)
 
+    def enableCreate(self,b):
+        self.isEnableCreate = not b
+        self.actions.create.setEnabled(self.isEnableCreate)
+
+    def enableCreateRo(self,b):
+        self.isEnableCreateRo = not b
+        self.actions.createRo.setEnabled(self.isEnableCreateRo)
+
     def toggleActions(self, value=True):
         """Enable/Disable widgets which depend on an opened image."""
         for z in self.actions.zoomActions:
@@ -530,7 +548,9 @@ class MainWindow(QMainWindow, WindowMixin):
         QTimer.singleShot(0, function)
 
     def status(self, message, delay=5000):
+        # print(message)
         self.statusBar().showMessage(message, delay)
+        self.statusBar().show()
 
     def resetState(self):
         self.itemsToShapes.clear()
@@ -590,6 +610,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.canvas.restoreCursor()
             self.actions.create.setEnabled(True)
             self.actions.createRo.setEnabled(True)
+            
 
     def toggleDrawMode(self, edit=True):
         self.canvas.setEditing(edit)
@@ -805,8 +826,8 @@ class MainWindow(QMainWindow, WindowMixin):
             self.addLabel(self.canvas.setLastLabel(text))
             if self.beginner():  # Switch to edit mode.
                 self.canvas.setEditing(True)
-                self.actions.create.setEnabled(True)
-                self.actions.createRo.setEnabled(True)
+                self.actions.create.setEnabled(self.isEnableCreate)
+                self.actions.createRo.setEnabled(self.isEnableCreateRo)
             else:
                 self.actions.editMode.setEnabled(True)
             self.setDirty()
@@ -1100,7 +1121,9 @@ class MainWindow(QMainWindow, WindowMixin):
     def openNextImg(self, _value=False):
         # Proceding next image without dialog if having any label
         if self.autoSaving is True and self.defaultSaveDir is not None:
-            if self.dirty is True:
+            if self.dirty is True: 
+                self.dirty = False
+                self.canvas.verified = True               
                 self.saveFile()
 
         if not self.mayContinue():
@@ -1119,6 +1142,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if filename:
             self.loadFile(filename)
+
 
     def openFile(self, _value=False):
         if not self.mayContinue():
