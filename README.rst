@@ -13,7 +13,6 @@ Update
 - Add a red arrow to each box to indicate the direction for better visualization.
 - Newly add 'Track' button to track the boxes and labels in previous image to next image, then we just need to fine tuning the box rather than redraw the boxes. The function is useful when you label the images which are consecutively shooted. 
 
-------------------
 roLabelImg is a graphical image annotation tool can label ROTATED rectangle regions, which is rewrite from 'labelImg'.
 
 The original version 'labelImg''s link is here<https://github.com/tzutalin/labelImg>.
