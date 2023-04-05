@@ -200,8 +200,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.addDockWidget(Qt.RightDockWidgetArea, self.dock)
         # Tzutalin 20160906 : Add file list and dock to move faster
         self.addDockWidget(Qt.RightDockWidgetArea, self.filedock)
-        self.dockFeatures = QDockWidget.DockWidgetClosable\
-            | QDockWidget.DockWidgetFloatable
+        self.dockFeatures = QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetFloatable
         self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
         self.filedock.setFeatures(self.filedock.features() ^ self.dockFeatures)
 
@@ -224,6 +223,9 @@ class MainWindow(QMainWindow, WindowMixin):
 
         openNextImg = action('&Next Image', self.openNextImg,
                              'd', 'next', u'Open Next')
+
+        trackCurrentLabels = action('&Track', self.trackCurrentLabels,
+                             's', 'next', u'Track')
 
         openPrevImg = action('&Prev Image', self.openPrevImg,
                              'a', 'prev', u'Open Prev')
@@ -376,7 +378,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         self.tools = self.toolbar('Tools')
         self.actions.beginner = (
-            open, opendir, openNextImg, openPrevImg, verify, save, None, create, createRo, copy, delete, None,
+            open, opendir, openNextImg, trackCurrentLabels, openPrevImg, verify, save, None, create, createRo, copy, delete, None,
             zoomIn, zoom, zoomOut, fitWindow, fitWidth)
 
         self.actions.advanced = (
@@ -522,6 +524,8 @@ class MainWindow(QMainWindow, WindowMixin):
         self.dirty = True
         self.canvas.verified = False
         self.actions.save.setEnabled(True)
+        self.actions.create.setEnabled(True)
+        self.actions.createRo.setEnabled(True)
 
     def setClean(self):
         self.dirty = False
@@ -534,6 +538,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.actions.create.setEnabled(self.isEnableCreate)
 
     def enableCreateRo(self,b):
+        print("hallow enableCreateRo")
         self.isEnableCreateRo = not b
         self.actions.createRo.setEnabled(self.isEnableCreateRo)
 
@@ -752,10 +757,8 @@ class MainWindow(QMainWindow, WindowMixin):
 
         def format_shape(s):
             return dict(label=s.label,
-                        line_color=s.line_color.getRgb()
-                        if s.line_color != self.lineColor else None,
-                        fill_color=s.fill_color.getRgb()
-                        if s.fill_color != self.fillColor else None,
+                        line_color=s.line_color.getRgb() if s.line_color != self.lineColor else None,
+                        fill_color=s.fill_color.getRgb() if s.fill_color != self.fillColor else None,
                         points=[(p.x(), p.y()) for p in s.points],
                        # add chris
                         difficult = s.difficult,
@@ -873,9 +876,10 @@ class MainWindow(QMainWindow, WindowMixin):
         for item, shape in self.itemsToShapes.items():
             item.setCheckState(Qt.Checked if value else Qt.Unchecked)
 
-    def loadFile(self, filePath=None):
+    def loadFile(self, filePath=None, trackCuerentLabels=False):
         """Load the specified file, or the last opened file if None."""
-        self.resetState()
+        if not trackCuerentLabels:
+            self.resetState()
         self.canvas.setEnabled(False)
         if filePath is None:
             filePath = self.settings.get('filename')
@@ -902,6 +906,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.imageData = self.labelFile.imageData
                 self.lineColor = QColor(*self.labelFile.lineColor)
                 self.fillColor = QColor(*self.labelFile.fillColor)
+                print(len(self.labelFile.shapes))
             else:
                 # Load image:
                 # read data first and store for saving into label file.
@@ -916,10 +921,13 @@ class MainWindow(QMainWindow, WindowMixin):
             self.status("Loaded %s" % os.path.basename(unicodeFilePath))
             self.image = image
             self.filePath = unicodeFilePath
-            self.canvas.loadPixmap(QPixmap.fromImage(image))
-            if self.labelFile:
-                self.loadLabels(self.labelFile.shapes)
-            self.setClean()
+            self.canvas.loadPixmap(QPixmap.fromImage(image), trackCuerentLabels) #whether track current labels
+            if not trackCuerentLabels:
+                if self.labelFile:
+                    self.loadLabels(self.labelFile.shapes)
+                self.setClean()
+            else:
+                self.setDirty()
             self.canvas.setEnabled(True)
             self.adjustScale(initial=True)
             self.paintCanvas()
@@ -927,7 +935,7 @@ class MainWindow(QMainWindow, WindowMixin):
             self.toggleActions(True)
 
             # Label xml file and show bound box according to its filename
-            if self.usingPascalVocFormat is True:
+            if self.usingPascalVocFormat is True and not trackCuerentLabels: # and not trackCuerentLabels
                 if self.defaultSaveDir is not None:
                     basename = os.path.basename(
                         os.path.splitext(self.filePath)[0]) + XML_EXT
@@ -1142,6 +1150,32 @@ class MainWindow(QMainWindow, WindowMixin):
 
         if filename:
             self.loadFile(filename)
+    
+    def trackCurrentLabels(self):
+        # Proceding next image without dialog if having any label
+        if self.autoSaving is True and self.defaultSaveDir is not None:
+            if self.dirty is True: 
+                self.dirty = False
+                self.canvas.verified = True               
+                self.saveFile()
+
+        if not self.mayContinue():
+            return
+
+        if len(self.mImgList) <= 0:
+            return
+
+        filename = None
+        if self.filePath is None:
+            filename = self.mImgList[0]
+        else:
+            currIndex = self.mImgList.index(self.filePath)
+            if currIndex + 1 < len(self.mImgList):
+                filename = self.mImgList[currIndex + 1]
+
+        if filename:
+            self.loadFile(filename, trackCuerentLabels=True)
+        
 
 
     def openFile(self, _value=False):

@@ -15,10 +15,12 @@ import math
 DEFAULT_LINE_COLOR = QColor(0, 255, 0, 128)
 DEFAULT_FILL_COLOR = QColor(255, 0, 0, 128)
 DEFAULT_SELECT_LINE_COLOR = QColor(255, 255, 255)
+DIRECTION_ARROW_COLOR = QColor(255, 0, 0)
 DEFAULT_SELECT_FILL_COLOR = QColor(0, 128, 255, 155)
 DEFAULT_VERTEX_FILL_COLOR = QColor(0, 255, 0, 255)
 DEFAULT_HVERTEX_FILL_COLOR = QColor(255, 0, 0)
-
+ARROW_LENGTH = 10
+ARROW_ANGLE = 0.5
 
 class Shape(object):
     P_SQUARE, P_ROUND = range(2)
@@ -71,7 +73,7 @@ class Shape(object):
         self.direction = self.direction % (2 * math.pi)
 
     def rotatePoint(self, p, theta):
-        order = p-self.center;
+        order = p-self.center
         cosTheta = math.cos(theta)
         sinTheta = math.sin(theta)
         pResx = cosTheta * order.x() + sinTheta * order.y()
@@ -111,7 +113,7 @@ class Shape(object):
             color = self.select_line_color if self.selected else self.line_color
             pen = QPen(color)
             # Try using integer sizes for smoother drawing(?)
-            pen.setWidth(max(1, int(round(2.0 / self.scale))))
+            pen.setWidth(max(2, int(round(2.0 / self.scale))))
             painter.setPen(pen)
 
             line_path = QPainterPath()
@@ -125,8 +127,8 @@ class Shape(object):
 
             for i, p in enumerate(self.points):
                 line_path.lineTo(p)
-                # print('shape paint points (%d, %d)' % (p.x(), p.y()))
                 self.drawVertex(vrtx_path, i)
+        
             if self.isClosed():
                 line_path.lineTo(self.points[0])
 
@@ -140,9 +142,38 @@ class Shape(object):
             painter.drawPath(line_path)
             painter.drawPath(vrtx_path)
             painter.fillPath(vrtx_path, self.vertex_fill_color)
-            if self.fill:
-                color = self.select_fill_color if self.selected else self.fill_color
-                painter.fillPath(line_path, color)
+
+            
+            if(len(self.points) == 4):
+                pen.setColor(DIRECTION_ARROW_COLOR)
+                painter.setPen(pen)
+                center = (self.points[0]+self.points[2]) / 2 # the center of rectangle
+                toward_point = (self.points[3] + self.points[0]) / 2 # the end point in the direction
+
+                arrow_center = QLineF(toward_point, center)
+                painter.drawLine(arrow_center)
+
+                arrow_center.setLength(ARROW_LENGTH)
+                arrow_center_x = arrow_center.x2() - arrow_center.x1()
+                arrow_center_y = arrow_center.y2() - arrow_center.y1()
+                
+                arrow_left_p2_x = arrow_center_x * math.cos(ARROW_ANGLE) - arrow_center_y * math.sin(ARROW_ANGLE)
+                arrow_left_p2_y = arrow_center_x * math.sin(ARROW_ANGLE) + arrow_center_y * math.cos(ARROW_ANGLE)
+                arrow_center.setP2(QPointF(arrow_center.x1() + arrow_left_p2_x, arrow_center.y1() + arrow_left_p2_y))
+                painter.drawLine(arrow_center)
+
+                arrow_right_p2_x = arrow_center_x * math.cos(-ARROW_ANGLE) - arrow_center_y * math.sin(-ARROW_ANGLE)
+                arrow_right_p2_y = arrow_center_x * math.sin(-ARROW_ANGLE) + arrow_center_y * math.cos(-ARROW_ANGLE)
+                arrow_center.setP2(QPointF(arrow_center.x1() + arrow_right_p2_x, arrow_center.y1() + arrow_right_p2_y))
+                painter.drawLine(arrow_center)
+
+                pen.setColor(color)
+                painter.setPen(pen)
+
+
+            #if self.fill:
+            #    color = self.select_fill_color if self.selected else self.fill_color
+            #    painter.fillPath(line_path, color)
 
             if self.center is not None:
                 center_path = QPainterPath()
@@ -156,7 +187,7 @@ class Shape(object):
 
     def paintNormalCenter(self, painter):
         if self.center is not None:
-            center_path = QPainterPath();
+            center_path = QPainterPath()
             d = self.point_size / self.scale
             center_path.addRect(self.center.x() - d / 2, self.center.y() - d / 2, d, d)
             painter.drawPath(center_path)

@@ -114,6 +114,6 @@ class LabelFile(object):
         h = math.sqrt((points[2][0]-points[1][0]) ** 2 +
             (points[2][1]-points[1][1]) ** 2)
 
-        angle = direction % math.pi
+        angle = math.pi - direction # % math.pi
 
         return (round(cx,4),round(cy,4),round(w,4),round(h,4),round(angle,6))
