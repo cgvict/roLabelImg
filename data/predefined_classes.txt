@@ -1,7 +1,7 @@
-ship
-plane
-dog
-person
-cat
-tv
-car
+postive_face
+negative_face
+open_eye
+closed_eye
+open_mouth
+closed_mouth
+phone_and_hand

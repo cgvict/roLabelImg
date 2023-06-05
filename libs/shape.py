@@ -11,6 +11,7 @@ except ImportError:
 
 from lib import distance
 import math
+from colors import *
 
 DEFAULT_LINE_COLOR = QColor(0, 255, 0, 128)
 DEFAULT_FILL_COLOR = QColor(255, 0, 0, 128)
@@ -65,6 +66,8 @@ class Shape(object):
             # is used for drawing the pending line a different color.
             self.line_color = line_color
 
+        self.labels = ['postive_face', 'negative_face', 'open_eye', 'closed_eye', 'open_mouth', 'closed_mouth', 'phone_and_hand']
+
 
     def rotate(self, theta):
         for i, p in enumerate(self.points):
@@ -110,10 +113,16 @@ class Shape(object):
 
     def paint(self, painter):
         if self.points:
-            color = self.select_line_color if self.selected else self.line_color
+            label_index = 7
+            for i in range(len(self.labels)):
+                if self.label == self.labels[i]:
+                    label_index = i
+                    break
+            color = colors(label_index)#self.select_line_color if self.selected else self.line_color
+            #print(self.label, label_index, color)
             pen = QPen(color)
             # Try using integer sizes for smoother drawing(?)
-            pen.setWidth(max(2, int(round(2.0 / self.scale))))
+            pen.setWidth(max(1, int(round(1.0 / self.scale))))
             painter.setPen(pen)
 
             line_path = QPainterPath()
@@ -127,6 +136,14 @@ class Shape(object):
 
             for i, p in enumerate(self.points):
                 line_path.lineTo(p)
+                # print('shape paint points (%d, %d)' % (p.x(), p.y()))
+                # if(i == len(self.points) - 1):
+                #     pen.setColor(DIRECTION_ARROW_COLOR)
+                #     painter.setPen(pen)
+                # cur_line = QLineF()
+                # cur_line.setP1(self.points[i])
+                # cur_line.setP2(self.points[(i + 1) % (len(self.points))])
+                # painter.drawLine(cur_line)
                 self.drawVertex(vrtx_path, i)
         
             if self.isClosed():
@@ -144,7 +161,7 @@ class Shape(object):
             painter.fillPath(vrtx_path, self.vertex_fill_color)
 
             
-            if(len(self.points) == 4):
+            if len(self.points) == 4 and self.isRotated:
                 pen.setColor(DIRECTION_ARROW_COLOR)
                 painter.setPen(pen)
                 center = (self.points[0]+self.points[2]) / 2 # the center of rectangle
