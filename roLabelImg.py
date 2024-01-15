@@ -1309,7 +1309,7 @@ class MainWindow(QMainWindow, WindowMixin):
                 for line in f:
                     line = line.strip()
                     if self.labelHist is None:
-                        self.lablHist = [line]
+                        self.labelHist = [line]
                     else:
                         self.labelHist.append(line)
 

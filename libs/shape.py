@@ -12,6 +12,8 @@ except ImportError:
 from lib import distance
 import math
 from colors import *
+import os
+import codecs
 
 DEFAULT_LINE_COLOR = QColor(0, 255, 0, 128)
 DEFAULT_FILL_COLOR = QColor(255, 0, 0, 128)
@@ -65,9 +67,18 @@ class Shape(object):
             # with an object attribute. Currently this
             # is used for drawing the pending line a different color.
             self.line_color = line_color
-
-        self.labels = ['postive_face', 'negative_face', 'open_eye', 'closed_eye', 'open_mouth', 'closed_mouth', 'phone_and_hand']
-
+        self.labels = None
+        self.loadPredefinedClasses(os.path.join('data', 'predefined_classes.txt'))
+    
+    def loadPredefinedClasses(self, predefClassesFile):
+        if os.path.exists(predefClassesFile) is True:
+            with codecs.open(predefClassesFile, 'r', 'utf8') as f:
+                for line in f:
+                    line = line.strip()
+                    if self.labels is None:
+                        self.labels = [line]
+                    else:
+                        self.labels.append(line)
 
     def rotate(self, theta):
         for i, p in enumerate(self.points):
