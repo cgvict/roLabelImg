@@ -178,7 +178,7 @@ class PascalVocWriter:
             w.text = str(each_object['w'])
             h = SubElement(robndbox, 'h')
             h.text = str(each_object['h'])
-            angle = SubElement(robndbox, 'angle')
+            angle = SubElement(robndbox, 'angle') 
             angle.text = str(each_object['angle'])
 
     def save(self, targetFile=None):
@@ -224,7 +224,7 @@ class PascalVocReader:
         cy = float(robndbox.find('cy').text)
         w = float(robndbox.find('w').text)
         h = float(robndbox.find('h').text)
-        angle = float(robndbox.find('angle').text)
+        angle = math.pi - float(robndbox.find('angle').text)
 
         p0x,p0y = self.rotatePoint(cx,cy, cx - w/2, cy - h/2, -angle)
         p1x,p1y = self.rotatePoint(cx,cy, cx + w/2, cy - h/2, -angle)
@@ -235,8 +235,8 @@ class PascalVocReader:
         self.shapes.append((label, points, angle, True, None, None, difficult))
 
     def rotatePoint(self, xc,yc, xp,yp, theta):        
-        xoff = xp-xc;
-        yoff = yp-yc;
+        xoff = xp-xc
+        yoff = yp-yc
 
         cosTheta = math.cos(theta)
         sinTheta = math.sin(theta)

@@ -845,9 +845,11 @@ class Canvas(QWidget):
         self.drawingPolygon.emit(False)
         self.update()
 
-    def loadPixmap(self, pixmap):
+    def loadPixmap(self, pixmap, trackCuerentLabels=False):
         self.pixmap = pixmap
-        self.shapes = []
+        if not trackCuerentLabels:
+            self.shapes = []
+        
         self.repaint()
 
     def loadShapes(self, shapes):
